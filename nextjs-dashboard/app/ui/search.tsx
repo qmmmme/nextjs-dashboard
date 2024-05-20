@@ -8,13 +8,16 @@ import { useDebouncedCallback} from 'use-debounce';
 export default function Search({ placeholder }: { placeholder: string }) {
   
   const searchParams = useSearchParams();
+  const pathName = usePathname();
+  const {replace} = useRouter();
   //This function will wrap the contents of handleSearch, and only run the code after a specific time once the user has stopped typing (300ms).
   const handleSearch = useDebouncedCallback((term: string) => {
     //URLSearchParams is a Web API that provides utility methods for manipulating the URL query parameters. Instead of creating a complex string literal, you can use it to get the params string like ?page=1&query=a
     const params = new URLSearchParams(searchParams);
+    params.set('page', '1');
     //Now that you have the query string. You can use Next.js's useRouter and usePathname hooks to update the URL.
-    const pathName = usePathname();
-    const {replace} = useRouter();
+  
+  
     if(term) {
       params.set('query', term);
     } else {
