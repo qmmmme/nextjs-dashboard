@@ -27,7 +27,7 @@ export default function Search({ placeholder }: { placeholder: string }) {
     replace(`${pathName}?${params?.toString()}`);// use optional chaining ?. to check whther it is null/undefined
     console.log(term);
     //now using npm i use-debounce
-  }, 300);
+  }, 300);//300 ms
   return (
     <div className="relative flex flex-1 flex-shrink-0">
       <label htmlFor="search" className="sr-only">

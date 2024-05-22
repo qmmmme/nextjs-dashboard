@@ -20,7 +20,7 @@ export default async function Page({searchParams,}:
  const query = searchParams?.query || '';
  const currentPage = Number(searchParams?.page) || 1;
 
- const totalPages = await fetchInvoicesPages(query);
+ const totalPages = await fetchInvoicesPages(query);//fetchInvoicesPages returns the total number of pages based on the search query
  return (
     <div className="w-full">
       <div className="flex w-full items-center justify-between">
@@ -34,7 +34,7 @@ export default async function Page({searchParams,}:
         <Table query={query} currentPage={currentPage} />
       </Suspense>
       <div className="mt-5 flex w-full justify-center">
-        {/* <Pagination totalPages={totalPages} /> */}
+        <Pagination totalPages={totalPages} /> 
       </div>
     </div>
   );
