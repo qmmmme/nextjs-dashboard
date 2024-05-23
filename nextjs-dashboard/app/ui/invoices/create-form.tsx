@@ -133,6 +133,14 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
                   </p>
                 ))}
             </div>
+            <div id="message-error" aria-live="polite" aria-atomic="true">
+              {state.errors?.status || state.errors?.amount || state.errors?.customerId 
+                 ? <p className="mt-2 text-sm text-red-500" key={state.message}>
+                    {state.message}
+                  </p> : ''
+              }
+            </div>    
+            
           </div>
         </fieldset>
       </div>
@@ -143,7 +151,7 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
         >
           Cancel
         </Link>
-        <Button type="submit">Create Invoice</Button>
+        <Button type="submit" aria-describedby='message-error'>Create Invoice</Button>
       </div>
     </form>
   );
