@@ -10,28 +10,50 @@ import { sql } from '@vercel/postgres';
 //You can do this with the revalidatePath function from Next.js:
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { error } from 'console';
 
 const FormSchema = z.object({
     id: z.string(),
-    customerId: z.string(),
-    amount: z.coerce.number(), //change from a string to number with coerce
-    status: z.enum(['pending', 'paid']), // use enum as union type
+    customerId: z.string({
+      invalid_type_error: 'Please select a customer',
+    }),
+    amount: z.coerce.number()
+      .gt(0, {message: 'Please enter an amount greater than $0.'}), //change from a string to number with coerce
+    status: z.enum(['pending', 'paid'], {
+      invalid_type_error: 'Please select an invoice status',
+    }), // use enum as union type
     date: z.string(),
 });
 const CreateInvoice = FormSchema.omit({id: true, date: true});
 
-
-export async function createInvoice(formData: FormData){
+// This is temporary until @types/react-dom is updated
+export type State = {
+  errors?: {
+    customerId?: string[];
+    amount?: string[];
+    status?: string[];
+  };
+  message?: string | null;
+};
+export async function createInvoice(prevState: State, formData: FormData){
     // const rawFormData = {
     //     customerId: formData.get('customerId'),
     //     amount: formData.get('amount'),
     //     status: formData.get('status'),
     // };
-    const {customerId, amount, status} = CreateInvoice.parse({
+    const validatedFields = CreateInvoice.safeParse({
         customerId: formData.get('customerId'),
         amount: formData.get('amount'),
         status: formData.get('status'),
     });
+    console.log(validatedFields);
+    // If form validation fails, return errors early. Otherwise, continue.
+    if (!validatedFields.success) {
+      return {
+        errors: validatedFields.error.flatten().fieldErrors,
+        message: 'Missing Fields. Failed to Create Invoice.',
+      };
+    }
     
     //Tip: If you're working with forms that have many fields, you may want to consider using the entries() method with JavaScript's Object.fromEntries(). 
     //For example:
@@ -43,6 +65,8 @@ export async function createInvoice(formData: FormData){
     //console.log(typeof rawFormData.amount);// input return a string
     //we'll use Zod, a TypeScript-first validation library that can simplify this task for you.
 
+    // Prepare data for insertion into the database
+    const { customerId, amount, status } = validatedFields.data;
     //t's usually good practice to store monetary values in cents in your database to eliminate JavaScript floating-point errors and ensure greater accuracy.
     const amountInCents = amount * 100;
     //Finally, let's create a new date with the format "YYYY-MM-DD" for the invoice's creation date:
@@ -63,12 +87,19 @@ export async function createInvoice(formData: FormData){
     redirect('/dashboard/invoices');
 };
 const UpdateInvoice = FormSchema.omit({id: true, date: true});
-export async function updateInvoice(id: string, formData: FormData){
-    const {customerId, amount, status} = UpdateInvoice.parse({
+export async function updateInvoice(id: string, prevState: State, formData: FormData){
+    const validatedFields = UpdateInvoice.safeParse({
         customerId: formData.get('customerId'),
         amount: formData.get('amount'),
         status: formData.get('status'),
     });
+    if (!validatedFields.success) {
+      return {
+        errors: validatedFields.error.flatten().fieldErrors,
+        message: 'Missing Fields. Failed to Create Invoice.',
+      };
+    }
+    const { customerId, amount, status } = validatedFields.data;
     const amountInCents = amount * 100;
     try {
         await sql`
