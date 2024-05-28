@@ -4,6 +4,12 @@ import { fetchInvoiceById, fetchCustomers } from '@/app/lib/data';
 
 //you can use a conditional to invoke notFound if the invoice doesn't exist:
 import { notFound } from 'next/navigation';
+import { Metadata } from 'next';
+
+//adding Metadata for enhancing SEO(Search Engine Optimization)
+export const metadata: Metadata = {
+  title: 'Edit',
+};
  
 export default async function Page({params}: {params: {id: string}}) {
   const id = params.id;

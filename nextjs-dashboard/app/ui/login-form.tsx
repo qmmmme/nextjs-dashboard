@@ -9,6 +9,8 @@ import {
 import { ArrowRightIcon } from '@heroicons/react/20/solid';
 import { Button } from './button';
 
+//use React's useFormState to call the server action and handle form errors, 
+//and use useFormStatus to handle the pending state of the form:
 import { useFormState, useFormStatus } from 'react-dom';
 import { authenticate } from '@/app/lib/action';
 

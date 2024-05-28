@@ -22,8 +22,10 @@ export const { auth, signIn, signOut } = NextAuth({
     ...authConfig,
     providers: [
         Credentials({
+            //use the authorize function to handle the authentication logic. Similarly to Server Actions, 
+            //you can use zod to validate the email and password before checking if the user exists in the database:
             async authorize(credentials) {
-              const parsedCredentials = z
+                const parsedCredentials = z
                 .object({ email: z.string().email(), password: z.string().min(6) })
                 .safeParse(credentials);
               if (parsedCredentials.success) {
